@@ -87,6 +87,7 @@ y2016$Count <- as.numeric(y2016$Count)
 #  .(Name, Gender), ACTION=sum(Count))
 
 # call a merge function to combine 2015 and 2016 dataframe, by Name and gender to Identify the commanality
+# no NA value will be added with these attributes - all = FALSE
 final <- merge(y2015, y2016, all = FALSE, by = c("Name", "Gender"))
 
 # Interesting finding is that all names starts with Zy*, few females names as compare to males. Count is almost name in both year
@@ -116,7 +117,7 @@ head(final.sort, 10)
 
 ```{r, echo=TRUE}
 
-# get femlare names only
+# read female names only
 name.female <- arrange(final.result[grep("F", final$Gender),], desc(Total))
 
 # get top 10 names
