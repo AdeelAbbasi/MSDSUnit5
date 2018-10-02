@@ -1,0 +1,138 @@
+---
+title: "Assignment Unit 5"
+author: "Adeel Abbasi"
+date: "September 29, 2018"
+output:
+  word_document: default
+  html_document: default
+---
+
+### Question #1 Data Munging 
+
+
+```{r, echo=TRUE}
+
+library('tidyr')
+library('plyr')
+
+# Read a yob2016.txt file
+
+df <- read.table("yob2016.txt", header = FALSE)
+
+# use a seperate method to split a single column into three columns
+# by default, separate split the value for non alpha-numeric character (we can use default)
+df <- separate(df, V1, c('Name', 'Gender', 'Count'))
+
+# Display the summary of the dataframe
+summary(df)
+
+# Display the structure of the dataframe...
+str(df)
+
+```
+
+```{r, echo=TRUE}
+
+#Find the names that has three y's at the end
+
+name = df[grep("y{3}$", df$Name),"Name"]
+
+# Display the name
+name
+
+# remove the name that has three y's
+y2016 <- df[-grep("y{3}$", df$Name),]
+
+# save the data into the new file 
+write.table(y2016, "y2016.txt", sep = ";", quote = FALSE, col.names = FALSE, row.names = FALSE) 
+
+#summary(y2016)
+
+#str(y2016)
+
+#tail(y2016)
+```
+
+### Question #2.	Data Merging
+
+```{r, echo=TRUE}
+
+# Read the new file into the y2015 variable
+
+y2015 <- read.table("yob2015.txt", header = FALSE)
+
+# Sepearte the column string into three columns
+
+y2015 <- separate(y2015, V1, c("Name", "Gender", "Count"))
+
+# Print last ten rows
+
+tail(y2015)
+
+# Interesting thing i found that names starting with Z are all have same count i.e.5, all are males and names starts with Zy*
+
+
+```
+
+#### Merging final
+
+```{r, echo=TRUE}
+
+# Converting the Count column to numeric becuase it's a number
+y2015$Count <- as.numeric(y2015$Count)
+y2016$Count <- as.numeric(y2016$Count)
+
+
+#ddply(merge(y15, y16, all.x=TRUE), 
+#  .(Name, Gender), ACTION=sum(Count))
+
+# call a merge function to combine 2015 and 2016 dataframe, by Name and gender to Identify the commanality
+final <- merge(y2015, y2016, all = FALSE, by = c("Name", "Gender"))
+
+# Interesting finding is that all names starts with Zy*, few females names as compare to males. Count is almost name in both year
+
+# printing last 10 rows
+
+tail(final, 10)
+
+```
+
+### Question # 3.	Data Summary 
+
+```{r, echo=TRUE}
+
+# Sum last two columns 
+final$Total <- final$Count.x + final$Count.y
+
+final.result <- final[, c("Name", "Gender", "Total")]
+
+# Sort the data with Total columns and show the top names of the both year combnie
+final.sort <- arrange(final.result, desc(Total))
+
+# showing top 10 results
+head(final.sort, 10)
+
+```
+
+```{r, echo=TRUE}
+
+# get femlare names only
+name.female <- arrange(final.result[grep("F", final$Gender),], desc(Total))
+
+# get top 10 names
+name.female.Top.10 <- head(name.female[,c("Name", "Total")], 10)
+
+# print top 10 female names
+name.female.Top.10
+
+# save into the file
+write.table(name.female.Top.10, "femaleName.csv", quote = FALSE, row.names = FALSE, col.names = FALSE, sep = ",")
+
+```
+
+### Question # 4 - Github link
+
+GitHub link: 
+https://github.com/AdeelAbbasi/MSDSUnit5/tree/master
+
+
